@@ -48,7 +48,7 @@ body {
 }
 
 /* ── Page Wrapper ──────────────────────────────────────────── */
-.register-wrapper {
+.login-wrapper {
   display: flex;
   width: min(960px, 100%);
   height: auto;
@@ -498,7 +498,7 @@ input[name="csrf_token"] { display: none; }
 @media (max-width: 768px) {
   body { align-items: flex-start; overflow: auto; }
 
-  .register-wrapper {
+  .login-wrapper {
     flex-direction: column;
     border-radius: 0;
     min-height: 100vh;
