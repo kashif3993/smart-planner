@@ -1,0 +1,10 @@
+/* assets/css/budget.css */
+.budget-summary {
+    background: #fff3e0;
+    border: 1px solid #ffe0b2;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-size: 1.1rem;
+    color: #d35400;
+}
