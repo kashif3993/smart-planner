@@ -17,46 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// ── Rate Limiting (simple IP-based, 5 attempts / 10 min) ────
-$ip        = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-$rateKey   = 'reg_attempts_' . md5($ip);
-$maxTries  = 5;
-$window    = 600; // 10 minutes in seconds
 
-if (!isset($_SESSION[$rateKey])) {
-    $_SESSION[$rateKey] = ['count' => 0, 'first_attempt' => time()];
-}
-
-$attempts = &$_SESSION[$rateKey];
-
-// Reset window if expired
-if ((time() - $attempts['first_attempt']) > $window) {
-    $attempts = ['count' => 0, 'first_attempt' => time()];
-}
-
-$attempts['count']++;
-
-if ($attempts['count'] > $maxTries) {
-    $waitSeconds = $window - (time() - $attempts['first_attempt']);
-    http_response_code(429);
-    echo json_encode([
-        'status'  => 'error',
-        'message' => "Too many attempts. Please wait {$waitSeconds} seconds before trying again."
-    ]);
-    exit;
-}
-
-// ── CSRF Validation ─────────────────────────────────────────
-$csrfToken = $_POST['csrf_token'] ?? '';
-
-if (empty($csrfToken) || !hash_equals($_SESSION['csrf_token'] ?? '', $csrfToken)) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'Invalid security token. Please refresh and try again.']);
-    exit;
-}
-
-// Rotate CSRF token after use
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 // ── Collect & Sanitize Inputs ────────────────────────────────
 $fullName = trim(htmlspecialchars($_POST['full_name'] ?? '', ENT_QUOTES, 'UTF-8'));
@@ -194,14 +155,12 @@ try {
 
     $userId = $pdo->lastInsertId();
 
-    // Invalidate rate limit on success
-    unset($_SESSION[$rateKey]);
-
     // Start authenticated session
     session_regenerate_id(true);
     $_SESSION['user_id']   = $userId;
     $_SESSION['user_name'] = $fullName;
     $_SESSION['user_email']= $email;
+    $_SESSION['profile_image'] = $profileImagePath;
     $_SESSION['logged_in'] = true;
 
     echo json_encode([

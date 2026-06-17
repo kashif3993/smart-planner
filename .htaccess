@@ -1,0 +1,17 @@
+RewriteEngine On
+RewriteBase /smart-planner/
+
+# If the request is for a valid directory or file, serve it directly
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# Route /dashboard to index.php
+RewriteRule ^dashboard/?$ index.php [L,QSA]
+
+# Route pages to pages directory
+RewriteCond %{DOCUMENT_ROOT}/smart-planner/pages/$1.php -f
+RewriteRule ^([a-zA-Z0-9_-]+)/?$ pages/$1.php [L,QSA]
+
+# Hide .php extensions for other pages in the root
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]

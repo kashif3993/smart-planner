@@ -203,49 +203,29 @@
 
 /* Venue Card specific */
 .venue-card {
-    padding: 16px 20px;
+    padding: 0;
     overflow: hidden;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
 }
 
-.venue-icon-area {
-    width: 64px;
-    height: 64px;
-    background: var(--primary-light);
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+.venue-image {
+    height: 100px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
 }
 
 .venue-details {
+    padding: 16px 20px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
     flex: 1;
-    min-width: 0;
 }
 
 .venue-name {
-    font-size: 1rem;
     font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 8px;
     color: var(--text-main);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.venue-location {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-bottom: 4px;
 }
 
 .view-map-link {
@@ -913,81 +893,4 @@ input:checked + .slider:before {
         gap: 12px;
         align-items: flex-start;
     }
-}
-
-/* =========================================
-   EMPTY STATE
-   ========================================= */
-.empty-state-full {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 80px 24px;
-    text-align: center;
-    gap: 16px;
-}
-
-.empty-state-full .empty-icon {
-    width: 96px;
-    height: 96px;
-    background: var(--primary-light);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.empty-state-full h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.empty-state-full p {
-    color: var(--text-muted);
-    max-width: 360px;
-    font-size: 0.95rem;
-}
-
-/* =========================================
-   LIST VIEW — EVENT GRID CARD EXTRAS
-   ========================================= */
-.card-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-muted);
-    padding: 4px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    transition: color 0.2s, background 0.2s;
-}
-
-.icon-btn:hover {
-    color: var(--primary);
-    background: var(--primary-light);
-}
-
-.avatar-initial {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #fff;
 }

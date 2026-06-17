@@ -12,12 +12,6 @@ if (!empty($_SESSION['logged_in'])) {
     exit;
 }
 
-// Generate CSRF token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-$csrf_token = $_SESSION['csrf_token'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -86,8 +80,6 @@ $csrf_token = $_SESSION['csrf_token'];
 
     <form id="login-form" novalidate autocomplete="off">
 
-      <!-- CSRF Token -->
-      <input type="hidden" name="csrf_token" id="csrf_token" value="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
 
       <!-- Email -->
       <div class="field-group">
