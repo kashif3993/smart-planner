@@ -1,4 +1,13 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /smart-planner/login.php');
+    exit;
+}
+
 $page_css = 'tasks.css';
 $page_js = 'tasks.js';
 require_once dirname(__DIR__) . '/includes/header.php';

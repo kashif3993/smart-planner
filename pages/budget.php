@@ -1,4 +1,13 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /smart-planner/login.php');
+    exit;
+}
+
 $page_css = 'budget.css';
 $page_js = 'budget.js';
 require_once dirname(__DIR__) . '/includes/header.php';

@@ -3,6 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /smart-planner/login.php');
+    exit;
+}
+
 $page_css = 'event.css';
 $page_js = 'event.js';
 $current_page = 'events';
@@ -11,7 +16,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 require_once dirname(__DIR__) . '/includes/aside.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
-$user_id = $_SESSION['user_id'] ?? 1;
+$user_id = $_SESSION['user_id'];
 $event_id = $_GET['id'] ?? null;
 
 // Always fetch an event to display the detail view. If no ID is provided, grab the most recent one.

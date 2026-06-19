@@ -3,6 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /smart-planner/login.php');
+    exit;
+}
+
 $page_css = 'events.css';
 $page_js = 'events.js';
 $current_page = 'events';
@@ -11,7 +16,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
 require_once dirname(__DIR__) . '/includes/aside.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
-$user_id = $_SESSION['user_id'] ?? 1;
+$user_id = $_SESSION['user_id'];
 
 // Fetch all real events for this user from the database
 $stmt = $pdo->prepare("SELECT * FROM events WHERE user_id = ? ORDER BY created_at DESC");

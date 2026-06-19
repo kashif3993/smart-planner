@@ -2,13 +2,20 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Redirect to login if user is not authenticated
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /smart-planner/login.php');
+    exit;
+}
+
 $page_css = 'dashboard.css';
 $page_js = 'dashboard.js';
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/aside.php';
 require_once __DIR__ . '/config/database.php';
 
-$user_id = $_SESSION['user_id'] ?? 1;
+$user_id = $_SESSION['user_id'];
 
 // 1. Total Events & Upcoming Events
 $stmt = $pdo->prepare("SELECT COUNT(*) as total, SUM(CASE WHEN event_date >= CURDATE() THEN 1 ELSE 0 END) as upcoming FROM events WHERE user_id = ?");
@@ -77,7 +84,7 @@ if(empty($recent_events_list)) {
 
 <main class="main-content dashboard-main">
     <div class="dashboard-header">
-        <h1>Welcome back</h1>
+        <h1>Welcome back, <?php echo htmlspecialchars($_SESSION['name'] ?? 'User'); ?></h1>
         <p>Your planning ecosystem is looking optimized for the week ahead.</p>
     </div>
 
