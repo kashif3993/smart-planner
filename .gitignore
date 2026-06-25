@@ -2,3 +2,6 @@
 /vendor
 /node_modules
 *.log
+config/ai.php
+som keys
+uploads/
