@@ -68,10 +68,12 @@ if ($method === 'POST') {
 
 function createEvent($pdo, $user_id) {
     try {
+        $totalBudget = $_POST['total_budget'] ?? 0;
+        
         $stmt = $pdo->prepare("
             INSERT INTO events 
-            (user_id, event_name, event_type, custom_event_type, event_date, guest_count, venue_name, location, total_budget, currency, description, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (user_id, event_name, event_type, custom_event_type, event_date, guest_count, venue_name, location, total_budget, description, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $user_id,
@@ -82,12 +84,48 @@ function createEvent($pdo, $user_id) {
             $_POST['guest_count'] ?? 0,
             $_POST['venue_name'] ?? null,
             $_POST['location'] ?? null,
-            $_POST['total_budget'] ?? 0,
-            $_POST['currency'] ?? 'PKR',
+            $totalBudget,
             $_POST['description'] ?? null,
             $_POST['status'] ?? 'Planning'
         ]);
-        echo json_encode(['status' => 'success', 'message' => 'Event created successfully', 'id' => $pdo->lastInsertId()]);
+        
+        $eventId = $pdo->lastInsertId();
+        
+        // --- Call AI Service ---
+        require_once dirname(__DIR__) . '/api/ai_service.php';
+        
+        $eventType = $_POST['custom_event_type'] ? $_POST['custom_event_type'] : ($_POST['event_type'] ?? 'Event');
+        $guestCount = $_POST['guest_count'] ?? 0;
+        $description = $_POST['description'] ?? '';
+        
+        $aiData = generateEventData($eventType, $guestCount, $totalBudget, $description);
+        
+        // 1. Insert AI Vendor Categories
+        if (isset($aiData['vendor_categories']) && is_array($aiData['vendor_categories'])) {
+            $stmtCat = $pdo->prepare("INSERT INTO vendor_categories (event_id, category_name, allocated_amount, suggested_percentage) VALUES (?, ?, ?, ?)");
+            foreach ($aiData['vendor_categories'] as $cat) {
+                $pct = (float)($cat['pct'] ?? 0);
+                $name = $cat['name'] ?? 'Vendor';
+                $allocated = ($totalBudget * $pct) / 100;
+                $stmtCat->execute([$eventId, $name, $allocated, $pct]);
+            }
+        }
+        
+        // 2. Insert AI Tasks
+        if (isset($aiData['tasks']) && is_array($aiData['tasks'])) {
+            $stmtTask = $pdo->prepare("INSERT INTO tasks (event_id, task_name, phase, status, priority, source) VALUES (?, ?, ?, 'Pending', 'Medium', 'AI')");
+            foreach ($aiData['tasks'] as $task) {
+                $phase = $task['phase'] ?? 'Pre-Planning';
+                $taskName = $task['task_name'] ?? 'Task';
+                // Enforce valid phase
+                if (!in_array($phase, ['Pre-Planning', 'Preparation', 'Day-Of'])) {
+                    $phase = 'Preparation';
+                }
+                $stmtTask->execute([$eventId, $taskName, $phase]);
+            }
+        }
+
+        echo json_encode(['status' => 'success', 'message' => 'Event created successfully', 'id' => $eventId]);
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Failed to create event: ' . $e->getMessage()]);
@@ -107,7 +145,7 @@ function updateEvent($pdo, $user_id) {
             UPDATE events SET 
             event_name = ?, event_type = ?, custom_event_type = ?, event_date = ?, 
             guest_count = ?, venue_name = ?, location = ?, total_budget = ?, 
-            currency = ?, description = ?, status = ?
+            description = ?, status = ?
             WHERE id = ? AND user_id = ?
         ");
         $stmt->execute([
@@ -119,7 +157,6 @@ function updateEvent($pdo, $user_id) {
             $_POST['venue_name'] ?? null,
             $_POST['location'] ?? null,
             $_POST['total_budget'] ?? 0,
-            $_POST['currency'] ?? 'PKR',
             $_POST['description'] ?? null,
             $_POST['status'] ?? 'Planning',
             $event_id,

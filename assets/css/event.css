@@ -421,6 +421,38 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
+/* Row Action Buttons */
+.row-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.row-action-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 5px 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.row-action-btn.edit:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.row-action-btn.delete:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+    background-color: var(--danger-light);
+}
+
 /* Pagination */
 .table-pagination {
     padding: 16px 24px;
@@ -497,11 +529,62 @@ input:checked + .slider:before {
 .btn-white:hover {
     background-color: #f8fafc;
 }
+/* Task Filter Bar */
+.task-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    background-color: #fafbfc;
+}
+
+.task-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.task-search-wrap svg {
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.task-search-wrap input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--text-main);
+    width: 100%;
+}
+
+.task-filter-bar select {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: white;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.875rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.task-filter-bar select:focus {
+    border-color: var(--primary);
+}
 
 
-/* =========================================
-   LIST VIEW STYLES
-   ========================================= */
 
 .list-toolbar {
     display: flex;

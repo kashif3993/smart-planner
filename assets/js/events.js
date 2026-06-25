@@ -90,7 +90,7 @@ function renderEventsGrid() {
         const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
         
         // Format Currency & Budget
-        const budgetFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: evt.currency || 'USD' }).format(evt.total_budget || 0);
+        const budgetFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'PKR' }).format(evt.total_budget || 0);
         
         // Format Date
         const dateObj = new Date(evt.event_date);
@@ -178,7 +178,6 @@ function openEventModal(eventData = null) {
         document.getElementById('eventType').value = eventData.event_type;
         document.getElementById('eventDate').value = eventData.event_date;
         document.getElementById('totalBudget').value = eventData.total_budget;
-        document.getElementById('currency').value = eventData.currency || 'PKR';
         document.getElementById('venueName').value = eventData.venue_name || '';
         document.getElementById('location').value = eventData.location || '';
         document.getElementById('guestCount').value = eventData.guest_count;

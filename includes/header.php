@@ -13,6 +13,7 @@ $header_user_image = !empty($_SESSION['profile_image']) ? '/smart-planner/' . $_
     <title>EventPro - Premium Planner</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/smart-planner/assets/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="/smart-planner/assets/css/style.css?v=<?php echo time(); ?>">
     <?php if (isset($page_css)): ?>
     <link rel="stylesheet" href="/smart-planner/assets/css/<?php echo $page_css; ?>?v=<?php echo time(); ?>">

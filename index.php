@@ -139,7 +139,7 @@ if(empty($recent_events_list)) {
                 </div>
             </div>
             
-            <div class="card global-progress">
+            <div class="card global-progress" data-progress="<?php echo $global_progress; ?>">
                 <h3>Global Progress</h3>
                 <div class="progress-ring-container">
                     <svg class="progress-ring" width="180" height="180">

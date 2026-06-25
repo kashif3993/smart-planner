@@ -8,12 +8,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$page_css = 'event.css';
-$page_js = 'event.js';
-$current_page = 'events';
-
-require_once dirname(__DIR__) . '/includes/header.php';
-require_once dirname(__DIR__) . '/includes/aside.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
 $user_id = $_SESSION['user_id'];
@@ -38,6 +32,13 @@ if (!$event) {
     header('Location: /smart-planner/event');
     exit;
 }
+
+$page_css = 'event.css';
+$page_js = 'event.js';
+$current_page = 'events';
+
+require_once dirname(__DIR__) . '/includes/header.php';
+require_once dirname(__DIR__) . '/includes/aside.php';
 
 $total_spent = 0;
 $tasks = [];
@@ -159,18 +160,21 @@ foreach ($tasks as $task) {
                 <div class="kpi-header">BUDGET UTILIZATION</div>
                 <div class="kpi-body flex-between">
                     <?php
-                        $currency_sym = ($event['currency'] === 'USD') ? '$' : 'PKR ';
+                        $currency_sym = 'PKR ';
                         $budget_display = $total_budget >= 1000
-                            ? $currency_sym . number_format($total_budget / 1000, 1) . 'k'
+                            ? $currency_sym . str_replace('.0', '', number_format($total_budget / 1000, 1)) . 'k'
                             : $currency_sym . number_format($total_budget, 0);
                         $spent_display = $total_spent >= 1000
-                            ? $currency_sym . number_format($total_spent / 1000, 1) . 'k'
+                            ? $currency_sym . str_replace('.0', '', number_format($total_spent / 1000, 1)) . 'k'
                             : $currency_sym . number_format($total_spent, 0);
                         $rem_display = $remaining_budget >= 1000
-                            ? $currency_sym . number_format(max(0,$remaining_budget) / 1000, 1) . 'k'
+                            ? $currency_sym . str_replace('.0', '', number_format(max(0,$remaining_budget) / 1000, 1)) . 'k'
                             : $currency_sym . number_format(max(0,$remaining_budget), 0);
                     ?>
-                    <div class="kpi-value-medium"><?php echo $spent_display; ?></div>
+                    <div class="kpi-stats">
+                        <div class="kpi-value-medium"><?php echo $spent_display; ?></div>
+                        <div class="kpi-subtext" style="margin-top: 2px;">Total Spent</div>
+                    </div>
                     <div class="kpi-icon bg-light-teal">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
                     </div>
@@ -192,11 +196,37 @@ foreach ($tasks as $task) {
                     <button class="btn btn-outline filter-btn" aria-label="Filter">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
                     </button>
-                    <button class="btn btn-primary add-task-btn">
+                    <button class="btn btn-primary add-task-btn" onclick="openTaskModal()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         Add Task
                     </button>
                 </div>
+            </div>
+
+            <!-- Search & Filter Bar -->
+            <div class="task-filter-bar">
+                <div class="task-search-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="taskSearchInput" placeholder="Search tasks..." oninput="filterTasks()">
+                </div>
+                <select id="filterPhase" onchange="filterTasks()">
+                    <option value="">All Phases</option>
+                    <option value="Pre-Planning">Pre-Planning</option>
+                    <option value="Preparation">Preparation</option>
+                    <option value="Day-Of">Day-Of</option>
+                </select>
+                <select id="filterPriority" onchange="filterTasks()">
+                    <option value="">All Priorities</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+                <select id="filterStatus" onchange="filterTasks()">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Skipped">Skipped</option>
+                </select>
             </div>
             
             <div class="task-table-container">
@@ -208,13 +238,14 @@ foreach ($tasks as $task) {
                             <th>DUE DATE</th>
                             <th>PRIORITY</th>
                             <th>STATUS</th>
+                            <th>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach (['Pre-Planning', 'Preparation', 'Day-Of'] as $phase_name): ?>
                             <?php if (!empty($grouped_tasks[$phase_name])): ?>
                                 <tr class="phase-row">
-                                    <td colspan="5"><?php echo strtoupper($phase_name); ?></td>
+                                    <td colspan="6"><?php echo strtoupper($phase_name); ?></td>
                                 </tr>
                                 <?php foreach ($grouped_tasks[$phase_name] as $task): ?>
                                     <?php
@@ -232,7 +263,7 @@ foreach ($tasks as $task) {
                                                 </div>
                                                 <div class="task-info">
                                                     <div class="t-name"><?php echo htmlspecialchars($task['task_name']); ?></div>
-                                                    <div class="t-note"><?php echo htmlspecialchars($task['description'] ?? 'Review details and manage requirements'); ?></div>
+                                                    <div class="t-note"><?php echo htmlspecialchars($task['notes'] ?? 'Review details and manage requirements'); ?></div>
                                                 </div>
                                             </div>
                                         </td>
@@ -246,6 +277,16 @@ foreach ($tasks as $task) {
                                                     <input type="checkbox" class="task-status-cb" data-id="<?php echo $task['id']; ?>" <?php echo $is_completed ? 'checked' : ''; ?>>
                                                     <span class="slider round"></span>
                                                 </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="row-actions">
+                                                <button class="row-action-btn edit" title="Edit" onclick='openTaskModal(<?php echo json_encode($task, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE); ?>)'>
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                                </button>
+                                                <button class="row-action-btn delete" title="Delete" onclick="deleteTaskById(<?php echo $task['id']; ?>)">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -281,8 +322,8 @@ foreach ($tasks as $task) {
         </div>
     </main>
 
-<!-- MODAL FOR CREATE/EDIT -->
 <?php 
 require_once dirname(__DIR__) . '/includes/event_modal.php';
+require_once dirname(__DIR__) . '/includes/task_modal.php';
 require_once dirname(__DIR__) . '/includes/footer.php'; 
 ?>

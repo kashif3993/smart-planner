@@ -38,13 +38,6 @@
                         <input type="number" name="total_budget" id="totalBudget" placeholder="100000" required>
                     </div>
 
-                    <div class="form-group">
-                        <label>Currency</label>
-                        <select name="currency" id="currency">
-                            <option value="USD">USD</option>
-                            <option value="PKR">PKR</option>
-                        </select>
-                    </div>
 
                     <div class="form-group">
                         <label>Venue Name</label>

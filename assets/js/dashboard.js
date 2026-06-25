@@ -52,9 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ringFill.style.strokeDashoffset = offset;
         }
 
-        // Animate to 75%
+        // Read progress from data attribute
+        const progressCard = document.querySelector('.global-progress');
+        const targetProgress = progressCard ? parseInt(progressCard.getAttribute('data-progress') || 0) : 0;
+
+        // Animate to target progress
         setTimeout(() => {
-            setProgress(75);
+            setProgress(targetProgress);
         }, 300);
     }
 

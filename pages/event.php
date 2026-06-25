@@ -75,7 +75,7 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $today = new DateTime();
             $diff = (int)$today->diff($evtDate)->format('%r%a');
             $daysRem = $diff > 0 ? $diff : 0;
-            $currency = $evt['currency'] ?? 'PKR';
+            $currency = 'PKR';
         ?>
         <div class="card event-grid-card" onclick="window.location.href='/smart-planner/events?id=<?php echo $evt['id']; ?>'" style="cursor:pointer;">
             <div class="card-top-row">
