@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const formData = new FormData(eventForm);
             
+            const btn = eventForm.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 5px;"></span> Saving...';
+            btn.disabled = true;
+
             fetch('/smart-planner/api/events.php', {
                 method: 'POST',
                 body: formData
@@ -55,6 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => {
                 console.error('Error saving event:', err);
                 alert('A network error occurred.');
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             });
         });
     }

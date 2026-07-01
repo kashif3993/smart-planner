@@ -60,6 +60,9 @@ if ($method === 'POST') {
         case 'toggle_status':
             toggleTaskStatus($pdo, $user_id);
             break;
+        case 'ai_suggest':
+            suggestTaskWithAI($pdo, $user_id);
+            break;
         default:
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Invalid POST action']);
@@ -193,3 +196,32 @@ function toggleTaskStatus($pdo, $user_id) {
         echo json_encode(['status' => 'error', 'message' => 'Failed to update task status']);
     }
 }
+
+function suggestTaskWithAI($pdo, $user_id) {
+    require_once __DIR__ . '/ai_service.php';
+    
+    $event_id = $_POST['event_id'] ?? null;
+    
+    if (!verifyEventOwnership($pdo, $event_id, $user_id)) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Invalid event or unauthorized']);
+        return;
+    }
+
+    try {
+        $stmt = $pdo->prepare("SELECT event_name, event_type, description FROM events WHERE id = ?");
+        $stmt->execute([$event_id]);
+        $event = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $eventType = $event['event_type'] ?? 'Event';
+        $description = $event['description'] ?? 'An upcoming event.';
+        
+        $suggestion = suggestSingleTask($eventType, $description);
+        
+        echo json_encode(['status' => 'success', 'data' => $suggestion]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'AI generation failed']);
+    }
+}
+

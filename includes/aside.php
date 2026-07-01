@@ -19,16 +19,23 @@
             </li>
             <li class="<?php echo ($current_page ?? '') === 'events' ? 'active' : ''; ?>">
                 <a href="/smart-planner/events">
-                    <i class="fa-solid fa-calendar-days" style="font-size: 18px; width: 24px; text-align: center;"></i>
+                    <i class="fa-regular fa-calendar" style="font-size: 18px; width: 24px; text-align: center;"></i>
                     Events
                 </a>
             </li>
             <li class="<?php echo ($current_page ?? '') === 'timeline' ? 'active' : ''; ?>">
                 <a href="/smart-planner/timeline">
-                    <i class="fa-solid fa-chart-gantt" style="font-size: 18px; width: 24px; text-align: center;"></i>
+                    <i class="fa-solid fa-timeline" style="font-size: 18px; width: 24px; text-align: center;"></i>
                     Timeline
                 </a>
             </li>
+            <li class="<?php echo ($current_page ?? '') === 'activity' ? 'active' : ''; ?>">
+                <a href="/smart-planner/activity">
+                    <i class="fa-solid fa-bolt" style="font-size: 18px; width: 24px; text-align: center;"></i>
+                    Activity Log
+                </a>
+            </li>
+
             <li class="<?php echo ($current_page ?? '') === 'budget' ? 'active' : ''; ?>">
                 <a href="/smart-planner/budget">
                     <i class="fa-solid fa-chart-pie" style="font-size: 18px; width: 24px; text-align: center;"></i>
@@ -62,13 +69,18 @@
             New Event
         </a>
         <ul class="bottom-nav">
-            <li>
+            <li class="<?php echo ($current_page ?? '') === 'settings' ? 'active' : ''; ?>">
                 <a href="/smart-planner/settings">
                     <i class="fa-solid fa-gear" style="font-size: 18px; width: 24px; text-align: center;"></i>
                     Settings
                 </a>
             </li>
-            
+            <li class="<?php echo ($current_page ?? '') === 'system_health' ? 'active' : ''; ?>">
+                <a href="/smart-planner/system_health">
+                    <i class="fa-solid fa-stethoscope" style="font-size: 18px; width: 24px; text-align: center;"></i>
+                    System Health
+                </a>
+            </li>
         </ul>
     </div>
 </aside>

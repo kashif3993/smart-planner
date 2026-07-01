@@ -94,7 +94,8 @@ function createEvent($pdo, $user_id) {
         // --- Call AI Service ---
         require_once dirname(__DIR__) . '/api/ai_service.php';
         
-        $eventType = $_POST['custom_event_type'] ? $_POST['custom_event_type'] : ($_POST['event_type'] ?? 'Event');
+        $customType = $_POST['custom_event_type'] ?? '';
+        $eventType = !empty($customType) ? $customType : ($_POST['event_type'] ?? 'Event');
         $guestCount = $_POST['guest_count'] ?? 0;
         $description = $_POST['description'] ?? '';
         

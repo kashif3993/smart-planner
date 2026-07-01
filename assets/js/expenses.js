@@ -174,14 +174,13 @@ function renderPage() {
                 </td>
                 <td data-label="Date">${dateStr}</td>
                 <td>
-                    <div class="dropdown" style="position:relative;">
-                        <button class="icon-btn" onclick="toggleDropdown(${item.id})">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button onclick="openModal(${item.id})" title="Edit" style="background:none; border:none; cursor:pointer; color:#6366f1; padding:4px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                         </button>
-                        <div id="action-menu-${item.id}" class="dropdown-menu">
-                            <a class="dropdown-item" onclick="openModal(${item.id})">Edit</a>
-                            <a class="dropdown-item text-danger" onclick="deleteExpense(${item.id})">Delete</a>
-                        </div>
+                        <button onclick="deleteExpense(${item.id})" title="Delete" style="background:none; border:none; cursor:pointer; color:#ef4444; padding:4px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                        </button>
                     </div>
                 </td>
             `;

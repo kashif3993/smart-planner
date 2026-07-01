@@ -8,7 +8,7 @@ function generateEventData($eventType, $guestCount, $budget, $description) {
         return getFallbackData($eventType, $budget);
     }
 
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . GEMINI_API_KEY;
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . GEMINI_API_KEY;
 
     $prompt = "You are an expert event planner AI. Generate a JSON object for an event of type '$eventType' for $guestCount guests with a budget of $budget. Description: '$description'. 
     
@@ -42,12 +42,13 @@ function generateEventData($eventType, $guestCount, $budget, $description) {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Fix for XAMPP Windows SSL issue
     // Timeout set to 15 seconds to not block UI forever
     curl_setopt($ch, CURLOPT_TIMEOUT, 15);
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    $curlError = curl_error($ch);
 
     if ($httpCode === 200 && $response) {
         $responseData = json_decode($response, true);
@@ -61,6 +62,8 @@ function generateEventData($eventType, $guestCount, $budget, $description) {
                 return $parsed;
             }
         }
+    } else {
+        error_log("AI API Error: HTTP $httpCode, cURL Error: $curlError, Response: $response");
     }
 
     // Fallback if AI fails or times out
@@ -86,5 +89,75 @@ function getFallbackData($eventType, $budget) {
             ['task_name' => 'Venue Setup', 'phase' => 'Day-Of'],
             ['task_name' => 'Vendor Coordination', 'phase' => 'Day-Of'],
         ]
+    ];
+}
+
+function suggestSingleTask($eventType, $description) {
+    if (GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE' || empty(GEMINI_API_KEY)) {
+        return [
+            'task_name' => 'Follow up with ' . $eventType . ' vendors',
+            'phase' => 'Preparation',
+            'priority' => 'Medium',
+            'notes' => 'Generated fallback task because AI key is missing.'
+        ];
+    }
+
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . GEMINI_API_KEY;
+
+    $prompt = "You are an expert event planner AI. I am planning an event of type '$eventType'. Description: '$description'. 
+    Please suggest ONE crucial missing task that I should add to my to-do list.
+    
+    The JSON must have this EXACT structure, nothing else:
+    {
+        \"task_name\": \"Specific task name\",
+        \"phase\": \"Pre-Planning\" | \"Preparation\" | \"Day-Of\",
+        \"priority\": \"Low\" | \"Medium\" | \"High\",
+        \"notes\": \"A brief 1-sentence description or tip for this task\"
+    }
+    
+    Output ONLY valid JSON without any markdown formatting.";
+
+    $data = [
+        "contents" => [
+            ["parts" => [["text" => $prompt]]]
+        ],
+        "generationConfig" => [
+            "temperature" => 0.8,
+            "responseMimeType" => "application/json"
+        ]
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Fix for XAMPP Windows SSL issue
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+
+    if ($httpCode === 200 && $response) {
+        $responseData = json_decode($response, true);
+        if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+            $jsonString = $responseData['candidates'][0]['content']['parts'][0]['text'];
+            $jsonString = str_replace(['```json', '```'], '', $jsonString);
+            $parsed = json_decode(trim($jsonString), true);
+            
+            if ($parsed && isset($parsed['task_name'])) {
+                return $parsed;
+            }
+        }
+    } else {
+        error_log("AI API Error (Single Task): HTTP $httpCode, cURL Error: $curlError, Response: $response");
+    }
+
+    return [
+        'task_name' => 'Review ' . $eventType . ' checklist',
+        'phase' => 'Preparation',
+        'priority' => 'Medium',
+        'notes' => 'Fallback task generated because the AI request failed.'
     ];
 }

@@ -310,16 +310,7 @@ foreach ($tasks as $task) {
             </div>
         </div>
 
-        <div class="card insight-card">
-            <div class="insight-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            </div>
-            <div class="insight-content">
-                <h3>Smart Planning Insight</h3>
-                <p>Based on previous events of this type, costs usually increase by 15% in the final month. Consider locking in your beverage package now to save an estimated <strong>$4,200</strong>.</p>
-            </div>
-            <button class="btn btn-white">Apply Optimization</button>
-        </div>
+        
     </main>
 
 <?php 

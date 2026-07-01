@@ -88,10 +88,13 @@ input[type=number] {
     flex-direction: column;
     position: fixed;
     height: 100vh;
+    height: 100dvh; /* Better mobile viewport support */
+    max-height: 100vh;
     left: 0;
     top: 0;
     z-index: 50;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden; /* Ensure only sidebar-nav scrolls */
 }
 
 .sidebar-overlay {
@@ -144,6 +147,8 @@ input[type=number] {
     flex: 1;
     padding: 24px 16px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    overscroll-behavior-y: contain; /* Prevent scrolling the body behind it */
     /* Hide scrollbar for IE, Edge and Firefox */
     -ms-overflow-style: none;
     scrollbar-width: none;

@@ -5,3 +5,5 @@
 config/ai.php
 som keys
 uploads/
+*.pdf
+list.txt

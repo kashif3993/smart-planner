@@ -81,6 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const formData = new FormData(eventForm);
             
+            const btn = eventForm.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 5px;"></span> Saving...';
+            btn.disabled = true;
+
             fetch('/smart-planner/api/events.php', {
                 method: 'POST',
                 body: formData
@@ -101,6 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => {
                 console.error('Error saving event:', err);
                 alert('A network error occurred.');
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             });
         });
     }
@@ -352,6 +361,68 @@ function openTaskModal(taskData = null) {
 function closeTaskModal() {
     const modal = document.getElementById('taskModal');
     modal.classList.remove('show');
+}
+
+function autoFillTaskWithAI() {
+    const eventId = document.getElementById('taskEventId').value;
+    if (!eventId) {
+        alert('Cannot generate a task without an associated event.');
+        return;
+    }
+
+    const btn = document.getElementById('aiAutoFillBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 5px;"></span> Generating...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('action', 'ai_suggest');
+    formData.append('event_id', eventId);
+
+    fetch('/smart-planner/api/tasks.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success' && data.data) {
+            const suggestion = data.data;
+            document.getElementById('taskName').value = suggestion.task_name || '';
+            
+            if (suggestion.phase) {
+                const phaseSelect = document.getElementById('taskPhase');
+                for(let i=0; i<phaseSelect.options.length; i++) {
+                    if(phaseSelect.options[i].value === suggestion.phase) {
+                        phaseSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            if (suggestion.priority) {
+                const prioritySelect = document.getElementById('taskPriority');
+                for(let i=0; i<prioritySelect.options.length; i++) {
+                    if(prioritySelect.options[i].value === suggestion.priority) {
+                        prioritySelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            document.getElementById('taskNotes').value = suggestion.notes || '';
+            document.getElementById('taskStatus').value = 'Pending';
+        } else {
+            alert('Could not generate a task: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(err => {
+        console.error('Error generating task:', err);
+        alert('A network error occurred while generating task.');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
 }
 
 function deleteTask() {

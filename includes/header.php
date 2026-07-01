@@ -3,7 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 $header_user_name = $_SESSION['user_name'] ?? 'User';
-$header_user_image = !empty($_SESSION['profile_image']) ? '/smart-planner/' . $_SESSION['profile_image'] : 'https://i.pravatar.cc/150?img=11';
+$header_user_image = 'https://i.pravatar.cc/150?img=11';
+if (!empty($_SESSION['profile_image'])) {
+    $img = $_SESSION['profile_image'];
+    $header_user_image = (strpos($img, '/smart-planner') === 0) ? $img : '/smart-planner/' . ltrim($img, '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
